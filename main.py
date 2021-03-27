@@ -1,11 +1,13 @@
-from pathlib import Path
-from os import path, listdir
 import json
+from os import path
+from pathlib import Path
 from suits import Suit
 from visions import visions
+import tkinter as tk
+from tkinter import filedialog
 
 tts_save_location = path.join(str(Path.home()), "Documents", "My Games", "Tabletop Simulator", "Saves")
-my_tts_save_location = path.join("D:\\", "Documents", "My Games", "Tabletop Simulator", "Saves") # TODO: Documents doesn't exist??
+
 game_state_key = "LuaScriptState"
 dispossessed_cards_key = "curDispossessedDeckCards"
 dispossessed_cards_count_key = "curDispossessedDeckCardCount"
@@ -18,11 +20,6 @@ def read_json_file(file_name):
     with open(file_name, 'r') as f:
         data = f.read()
     return json.loads(data)
-
-
-def read_save_file(save_file_name):
-    save_file = path.join(my_tts_save_location, save_file_name + ".json")
-    return read_json_file(save_file)
 
 
 def order_by_suit(card_list):
@@ -88,9 +85,16 @@ def parse_oath_save_json(json_data):
     print_suit_ordered_card_list(order_by_suit(archive))
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    save_file_name = "TS_Save_6" # Have user enter this?
-    json_data = read_save_file(save_file_name)
-    parse_oath_save_json(json_data)
+    default_path = tts_save_location if path.isdir(tts_save_location) else "."
+
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(initialdir=default_path,
+                                           title="Oath Save File",
+                                           filetypes=[("json files","*.json")])
+
+    if file_path:
+        save_file_json = read_json_file(file_path)
+        parse_oath_save_json(save_file_json)
 
